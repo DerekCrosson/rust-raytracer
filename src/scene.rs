@@ -16,7 +16,8 @@ pub struct Scene {
   pub width: u32,
   pub height: u32,
   pub fov: f64,
-  pub sphere: Sphere,
+  pub elements: Vec<Element>,
+  pub light: Light,
 }
 
 pub struct Intersection<'a> {
@@ -33,6 +34,12 @@ pub struct Plane {
 pub enum Element {
   Sphere(Sphere),
   Plane(Plane),
+}
+
+pub struct Light {
+  pub direction: Vector3,
+  pub color: Color,
+  pub intensity: f32,
 }
 
 impl<'a> Intersection<'a> {
