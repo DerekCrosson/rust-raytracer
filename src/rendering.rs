@@ -1,4 +1,4 @@
-// The ray structure.
+// Structure for the ray
 pub struct Ray {
   pub origin: Point,
   pub direction: Vector3,
@@ -41,21 +41,33 @@ impl Ray {
   }
 }
 
-
 pub trait Intersectable {
-  fn intersect(&self, ray: &Ray) -> bool;
+  fn intersect(&self, ray: &Ray) -> Option<f64>;
 }
 
 impl Intersectable for Sphere {
-  fn intersect(&self, ray: &Ray) -> bool {
-    // Create a line segment between the ray origin and the center of the sphere.
+  fn intersect(&self, ray: &Ray) -> Option<f64> {
+    // Create the sphere.
     let l: Vector3 = self.center - ray.origin;
-    // Use l as a hypotenuse and find the length of the adjacent side.
-    let adj2 = l.dot(&ray.direction);
-    // Find the length-squared of the opposite side
-    // This is equivalent to (but faster than) (l.length() * l.length()) - (adj2 * adj2)
-    let d2 = l.dot(&l) - (adj2 * adj2);
-    // If that length-squared is less than radius squared, the ray intersects the sphere.
-    d2 < (self.radius * self.radius)
+    let adj = l.dot(&ray.direction);
+    let d2 = l.dot(&l) - (adj * adj);
+    let radius2 = self.radius * self.radius;
+    
+    if d2 > radius2 {
+     return None;
+    }
+    
+    // Create a triangle between the point that the ray intersects the sphere and the center of the sphere
+    let thc = (radius2 - d2).sqrt();
+    let t0 = adj - thc;
+    let t1 = adj + thc;
+
+    if t0 < 0.0 && t1 < 0.0 {
+       return None;
+    }
+    
+    // Use the Pythagoras Theorem to calculate the distance from the right angle to the intersection point.
+    let distance = if t0 < t1 { t0 } else { t1 };
+    Some(distance)
   }
 }
